@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+#
 
 __filepath__ = "/media/Data1/workspace/git/sentiment analysis/data_preprocessing/"
 
@@ -19,7 +20,64 @@ class DataProcessing:
 		except OSError as exception:
 			if exception.errno != errno.EEXIST:
 				raise
-   
+				
+	@staticmethod
+	def asciiEncoding(tmpfilepath):
+		print "ascii encoding..."
+		os.system("sed -i \"s|[àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]||g\" " + tmpfilepath)
+		
+	@staticmethod
+	def removeHtmlTags(tmpfilepath):
+		print "replacing tags <a>, </a>, <e> and </e>..."
+		os.system("sed -i \"s|<a>| |g\" " + tmpfilepath)
+		os.system("sed -i \"s|<e>| |g\" " + tmpfilepath)
+		os.system("sed -i \"s|</a>||g\" " + tmpfilepath)
+		os.system("sed -i \"s|</e>||g\" " + tmpfilepath)
+
+	@staticmethod
+	def removeUrls(tmpfilepath):
+		print "remove urls..."
+		os.system("sed -i \"s|http://t\.co/\w*||g\" " + tmpfilepath)
+		os.system("sed -i \"s|https://t\.co/\w*||g\" " + tmpfilepath)
+		
+	@staticmethod
+	def basicStemming(tmpfilepath):
+		#removing "'s", "'re" replaced with "are", removing "'"
+		print "basic stemming..."
+		os.system("sed -i \"s|'s||g\" " + tmpfilepath)
+		os.system("sed -i \"s|'re| are|g\" " + tmpfilepath)
+		os.system("sed -i \"s|'||g\" " + tmpfilepath)	
+		
+	@staticmethod
+	def removeTagsAndUsers(tmpfilepath):
+		print "removing #tags and @usernames..."
+		os.system("sed -i \"s|#\w*||g\" " + tmpfilepath)
+		os.system("sed -i \"s|@\w*||g\" " + tmpfilepath)
+		
+	@staticmethod
+	def toLowerCase(tmpfilepath):
+		print "all text to lower case..."
+		os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath
+		
+	@staticmethod
+	def normalizeEntityNames(tmpfilepath):
+		print "replacing entitiy names..."
+		os.system("sed -i \"s|barak|obama|g\" " + tmpfilepath)
+		os.system("sed -i \"s|barak obama|obama|g\" " + tmpfilepath)
+		os.system("sed -i \"s|mitt|romney|g\" " + tmpfilepath)
+		os.system("sed -i \"s|mitt romney|romney|g\" " + tmpfilepath)
+		os.system("sed -i \"s|mr.president|obama|g\" " + tmpfilepath)
+		os.system("sed -i \"s|mr. president|obama|g\" " + tmpfilepath)
+		
+	@staticmethod
+	def trimAll(tmpfilepath):
+		print "removing extra spaces"
+		os.system("sed -i \"s|[ ]{2,}|g\" " + tmpfilepath)
+		
+	@staticmethod
+	def retainOnlyText(tmpfilepath):
+		print "TODO retain only text"
+	   
 def main():
 	print "data processing..."
 
@@ -33,43 +91,21 @@ def main():
 	tmpfilepath = tmpfilepath.replace(" ","\\ ")
 	print "temp file path: " + tmpfilepath
 
-	print "ascii encoding..."
-	os.system("sed -i \"s|[àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]||g\" " + tmpfilepath)
-		
-	print "replacing tags <a>, </a>, <e> and </e>..."
-	os.system("sed -i \"s|<a>| |g\" " + tmpfilepath)
-	os.system("sed -i \"s|<e>| |g\" " + tmpfilepath)
-	os.system("sed -i \"s|</a>||g\" " + tmpfilepath)
-	os.system("sed -i \"s|</e>||g\" " + tmpfilepath)
+	DataProcessing.asciiEncoding(tmpfilepath)
 	
-	print "remove urls..."
-	os.system("sed -i \"s|http://t\.co/\w*||g\" " + tmpfilepath)
-	os.system("sed -i \"s|https://t\.co/\w*||g\" " + tmpfilepath)
+	DataProcessing.removeHtmlTags(tmpfilepath)
+	DataProcessing.removeUrls(tmpfilepath)
 	
-	print "basic stemming - removing \"'s\", \"'re\" replaced with \"are\", removing \"'\"..."
-	os.system("sed -i \"s|'s||g\" " + tmpfilepath)
-	os.system("sed -i \"s|'re| are|g\" " + tmpfilepath)
-	os.system("sed -i \"s|'||g\" " + tmpfilepath)
+	DataProcessing.basicStemming(tmpfilepath)
 	
-	print "removing twitter @usernames..."
-	os.system("sed -i \"s|@\w*||g\" " + tmpfilepath)
+	DataProcessing.removeTagsAndUsers(tmpfilepath)
 	
-	print "transform all text to lower case..."
-	os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath)
+	DataProcessing.toLowerCase(tmpfilepath)
+	DataProcessing.normalizeEntityNames(tmpfilepath)
 	
-	print "removing #tags..."
-	os.system("sed -i \"s|#\w*||g\" " + tmpfilepath)
+	DataProcessing.retainOnlyText(tmpfilepath)
 	
-	print "replacing entitiy names..."
-	os.system("sed -i \"s|barak|obama|g\" " + tmpfilepath)
-	os.system("sed -i \"s|barak obama|obama|g\" " + tmpfilepath)
-	os.system("sed -i \"s|mitt|romney|g\" " + tmpfilepath)
-	os.system("sed -i \"s|mitt romney|romney|g\" " + tmpfilepath)
-	os.system("sed -i \"s|mr.president|obama|g\" " + tmpfilepath)
-	os.system("sed -i \"s|mr. president|obama|g\" " + tmpfilepath)
-	
-	print "removing extra spaces"
-	os.system("sed -i \"s|[ ]{2,}|g\" " + tmpfilepath)
+	DataProcessing.trimAll(tmpfilepath)
 	
 if __name__ == '__main__':
     main()
