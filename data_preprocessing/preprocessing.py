@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 __filepath__ = "/media/Data1/workspace/git/sentiment analysis/data_preprocessing/"
 
@@ -29,7 +30,38 @@ def main():
 	tmpfilepath = DataProcessing.createTmpDir(__filepath__,filename)  
 	shutil.copy2(filepath, tmpfilepath)
 	
+	tmpfilepath = tmpfilepath.replace(" ","\\ ")
+	print "temp file path: " + tmpfilepath
 
+	print "ascii encoding..."
+	os.system("sed -i \"s|[àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]||g\" " + tmpfilepath)
+		
+	print "replacing tags <a>, </a>, <e> and </e>..."
+	os.system("sed -i \"s|<a>| |g\" " + tmpfilepath)
+	os.system("sed -i \"s|<e>| |g\" " + tmpfilepath)
+	os.system("sed -i \"s|</a>||g\" " + tmpfilepath)
+	os.system("sed -i \"s|</e>||g\" " + tmpfilepath)
+	
+	print "remove urls..."
+	os.system("sed -i \"s|http://t\.co/\w*||g\" " + tmpfilepath)
+	os.system("sed -i \"s|https://t\.co/\w*||g\" " + tmpfilepath)
+	
+	print "basic stemming - removing \"'s\", \"'re\" replaced with \"are\", removing \"'\"..."
+	os.system("sed -i \"s|'s||g\" " + tmpfilepath)
+	os.system("sed -i \"s|'re| are|g\" " + tmpfilepath)
+	os.system("sed -i \"s|'||g\" " + tmpfilepath)
+	
+	print "removing twitter @usernames..."
+	os.system("sed -i \"s|@\w*||g\" " + tmpfilepath)
+	
+	print "transform all text to lower case..."
+	os.system("tr '[:upper:]' '[:lower:]' " + tmpfilepath)
+	
+	print "removing #tags..."
+	os.system("sed -i \"s|#\w*||g\" " + tmpfilepath)
+	
+	
+	
 if __name__ == '__main__':
     main()
 
