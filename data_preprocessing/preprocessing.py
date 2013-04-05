@@ -55,12 +55,21 @@ def main():
 	os.system("sed -i \"s|@\w*||g\" " + tmpfilepath)
 	
 	print "transform all text to lower case..."
-	os.system("tr '[:upper:]' '[:lower:]' " + tmpfilepath)
+	os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath)
 	
 	print "removing #tags..."
 	os.system("sed -i \"s|#\w*||g\" " + tmpfilepath)
 	
+	print "replacing entitiy names..."
+	os.system("sed -i \"s|barak|obama|g\" " + tmpfilepath)
+	os.system("sed -i \"s|barak obama|obama|g\" " + tmpfilepath)
+	os.system("sed -i \"s|mitt|romney|g\" " + tmpfilepath)
+	os.system("sed -i \"s|mitt romney|romney|g\" " + tmpfilepath)
+	os.system("sed -i \"s|mr.president|obama|g\" " + tmpfilepath)
+	os.system("sed -i \"s|mr. president|obama|g\" " + tmpfilepath)
 	
+	print "removing extra spaces"
+	os.system("sed -i \"s|[ ]{2,}|g\" " + tmpfilepath)
 	
 if __name__ == '__main__':
     main()
