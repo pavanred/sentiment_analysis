@@ -16,7 +16,8 @@ class DataProcessing:
 		tmpDir = os.path.join(path,"tmp" + str(time.time())) 		
 		try:
 			os.makedirs(tmpDir)
-			return os.path.join(tmpDir,filename)
+			#return os.path.join(tmpDir,filename)
+			return tmpDir
 		except OSError as exception:
 			if exception.errno != errno.EEXIST:
 				raise
@@ -57,11 +58,11 @@ class DataProcessing:
 	@staticmethod
 	def toLowerCase(tmpfilepath):
 		print "all text to lower case..."
-		os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath
+		os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath)
 		
 	@staticmethod
 	def normalizeEntityNames(tmpfilepath):
-		print "replacing entitiy names..."
+		print "normalizing entitiy names..."
 		os.system("sed -i \"s|barak|obama|g\" " + tmpfilepath)
 		os.system("sed -i \"s|barak obama|obama|g\" " + tmpfilepath)
 		os.system("sed -i \"s|mitt|romney|g\" " + tmpfilepath)
@@ -70,13 +71,23 @@ class DataProcessing:
 		os.system("sed -i \"s|mr. president|obama|g\" " + tmpfilepath)
 		
 	@staticmethod
-	def trimAll(tmpfilepath):
-		print "removing extra spaces"
-		os.system("sed -i \"s|[ ]{2,}|g\" " + tmpfilepath)
+	def trimAll(tmpDir):
+		print "removing extra spaces ..."
+		os.system("sed -i \"s|[ ]{2,}||g\" " + tmpDir + "/tweets.txt")		
 		
 	@staticmethod
-	def retainOnlyText(tmpfilepath):
-		print "TODO retain only text"
+	def retainOnlyText(tmpfilepath, tmpDir):
+		print "retain only text ..."
+		os.system("awk -F \",\" '{print $4}' " + tmpfilepath + " >> " + tmpDir + "/tweets.txt")
+		os.system("sed -i \"s|[^a-zA-Z]| |g\" " + tmpDir + "/tweets.txt")
+		
+	@staticmethod
+	def getWordList(tmpDir):
+		print "creating word count file..."
+		#os.system("tr ' ' '\12' <$4.txt | sort | uniq -c | sort -nr >> wordcount.txt")
+		#wordlistfile = os.path.join(tmpDir,"wordlist.txt")
+		os.system("tr ' ' '\12' < " + tmpDir + "/tweets.txt | uniq >> " + tmpDir + "/wordlist.txt")
+		
 	   
 def main():
 	print "data processing..."
@@ -85,9 +96,11 @@ def main():
 	filepath = os.path.join(__filepath__ , "data")
 	filepath = os.path.join(filepath, filename)
 
-	tmpfilepath = DataProcessing.createTmpDir(__filepath__,filename)  
+	tmpDir = DataProcessing.createTmpDir(__filepath__,filename)  
+	tmpfilepath = os.path.join(tmpDir,filename)
 	shutil.copy2(filepath, tmpfilepath)
 	
+	tmpDir = tmpDir.replace(" ","\\ ")
 	tmpfilepath = tmpfilepath.replace(" ","\\ ")
 	print "temp file path: " + tmpfilepath
 
@@ -103,9 +116,12 @@ def main():
 	DataProcessing.toLowerCase(tmpfilepath)
 	DataProcessing.normalizeEntityNames(tmpfilepath)
 	
-	DataProcessing.retainOnlyText(tmpfilepath)
+	DataProcessing.retainOnlyText(tmpfilepath, tmpDir)
 	
-	DataProcessing.trimAll(tmpfilepath)
+	DataProcessing.trimAll(tmpDir)
+	DataProcessing.getWordList(tmpDir)
+	
+	print "temp file path: " + tmpfilepath
 	
 if __name__ == '__main__':
     main()
