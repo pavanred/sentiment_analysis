@@ -58,7 +58,7 @@ class DataProcessing:
 	@staticmethod
 	def toLowerCase(tmpfilepath):
 		print "all text to lower case..."
-		os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath)
+		os.system("tr '[:upper:]' '[:lower:]' < " + tmpfilepath + " > " + tmpfilepath)
 		
 	@staticmethod
 	def normalizeEntityNames(tmpfilepath):
@@ -113,13 +113,13 @@ def main():
 	
 	DataProcessing.removeTagsAndUsers(tmpfilepath)
 	
-	DataProcessing.toLowerCase(tmpfilepath)
+	#DataProcessing.toLowerCase(tmpfilepath)
 	DataProcessing.normalizeEntityNames(tmpfilepath)
 	
 	DataProcessing.retainOnlyText(tmpfilepath, tmpDir)
 	
-	DataProcessing.trimAll(tmpDir)
-	DataProcessing.getWordList(tmpDir)
+	#DataProcessing.trimAll(tmpDir)
+	#DataProcessing.getWordList(tmpDir)
 	
 	print "temp file path: " + tmpfilepath
 	
