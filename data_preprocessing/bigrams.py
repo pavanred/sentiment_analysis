@@ -6,6 +6,7 @@ from nltk import bigrams
 import fileinput
 import re
 import csv
+from nltk.corpus import stopwords
 
 #def gen_ML_Bigram(text):
 #        texfbig = codecs.open(text,'r','utf8').read()
@@ -26,8 +27,6 @@ def gen_ML_Bigram(text):
 		for row in reader:
 			line = row[3]
 			verdict = row[6]
-			print line
-			print verdict
 			line = line.lower()
 			line = line.replace(':)','positive')
 			line = line.replace(':-)','positive')
@@ -46,10 +45,17 @@ def gen_ML_Bigram(text):
 			line = line.replace('barak','obama')
 			line = line.replace('mitt','romney')
 			line = line.replace('mrpresident','obama')
-			out_file.write(line + "," + verdict)
+			verdict = verdict.replace('!!!!','2')
+			
+			newline = ""
+			for word in line.split( ):
+				if word not in stopwords.words('english'):
+					newline = newline + " " + word			
+			out_file.write(newline + "," + verdict)
 			out_file.write("\n")
-	
-			tokens = line.split()
+			print newline + "," + verdict
+
+			tokens = newline.split()
 			ml_bigram = bigrams(tokens)       		
         		for ml in ml_bigram:
         			out.write(" ".join(ml))
